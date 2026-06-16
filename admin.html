@@ -12,7 +12,7 @@
     </script>
 
     <script type="module">
-        import { pullFromCloudToLocal } from './firebase-config.js';
+        import { pullFromCloudToLocal, uploadAllToCloud } from './firebase-config.js';
         
         window.addEventListener('DOMContentLoaded', async () => {
             await pullFromCloudToLocal();
