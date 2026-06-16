@@ -2,7 +2,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
 import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
-// Your exact web app's Firebase configuration from the screenshot
 const firebaseConfig = {
     apiKey: "AIzaSyBb7rL0fM_iX3bzsqZF1KZ-uc4nV-X2N9I",
     authDomain: "prime-portal-27b1d.firebaseapp.com",
@@ -13,13 +12,9 @@ const firebaseConfig = {
     measurementId: "G-83XET5YB2J"
 };
 
-// Initialize Firebase & Firestore
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/**
- * Pushes all current localStorage datasets up to the Firestore Cloud
- */
 export async function uploadAllToCloud() {
     const masterPayload = {
         adminData: JSON.parse(localStorage.getItem('adminData')) || [],
@@ -34,7 +29,6 @@ export async function uploadAllToCloud() {
     };
     
     try {
-        // Saves everything into a single master document inside a 'portal_data' collection
         await setDoc(doc(db, "portal_data", "classroom_master"), masterPayload);
         console.log("☁️ Cloud Database sync complete!");
     } catch (error) {
@@ -42,9 +36,6 @@ export async function uploadAllToCloud() {
     }
 }
 
-/**
- * Pulls the latest cloud data down and overwrites browser localStorage
- */
 export async function pullFromCloudToLocal() {
     try {
         const docRef = doc(db, "portal_data", "classroom_master");
@@ -52,7 +43,6 @@ export async function pullFromCloudToLocal() {
         
         if (docSnap.exists()) {
             const data = docSnap.data();
-            // Dynamically rebuild localStorage keys based on cloud values
             Object.keys(data).forEach(key => {
                 localStorage.setItem(key, JSON.stringify(data[key]));
             });
