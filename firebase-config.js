@@ -15,17 +15,21 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+/**
+ * Pushes all current localStorage datasets up to the Firestore Cloud
+ */
 export async function uploadAllToCloud() {
     const masterPayload = {
-        adminData: JSON.parse(localStorage.getItem('adminData')) || [],
-        staffData: JSON.parse(localStorage.getItem('staffData')) || [],
-        studentData: JSON.parse(localStorage.getItem('studentData')) || [],
-        noticeData: JSON.parse(localStorage.getItem('noticeData')) || [],
-        hwRecords: JSON.parse(localStorage.getItem('hwRecords')) || [],
-        cwRecords: JSON.parse(localStorage.getItem('cwRecords')) || [],
-        reportRecords: JSON.parse(localStorage.getItem('reportRecords')) || [],
-        attendanceRecords: JSON.parse(localStorage.getItem('attendanceRecords')) || [],
-        messageData: JSON.parse(localStorage.getItem('messageData')) || []
+        adminData: localStorage.getItem('adminData') || "[]",
+        staffData: localStorage.getItem('staffData') || "[]",
+        studentData: localStorage.getItem('studentData') || "[]",
+        noticeData: localStorage.getItem('noticeData') || "[]",
+        hwRecords: localStorage.getItem('hwRecords') || "[]",
+        cwRecords: localStorage.getItem('cwRecords') || "[]",
+        reportRecords: localStorage.getItem('reportRecords') || "[]",
+        attendanceRecords: localStorage.getItem('attendanceRecords') || "[]",
+        messageData: localStorage.getItem('messageData') || "[]",
+        systemTheme: localStorage.getItem('systemTheme') || "blue"
     };
     
     try {
@@ -36,6 +40,9 @@ export async function uploadAllToCloud() {
     }
 }
 
+/**
+ * Pulls the latest cloud data down and overwrites browser localStorage
+ */
 export async function pullFromCloudToLocal() {
     try {
         const docRef = doc(db, "portal_data", "classroom_master");
@@ -44,13 +51,14 @@ export async function pullFromCloudToLocal() {
         if (docSnap.exists()) {
             const data = docSnap.data();
             Object.keys(data).forEach(key => {
-                localStorage.setItem(key, JSON.stringify(data[key]));
+                localStorage.setItem(key, data[key]);
             });
             console.log("🔄 Local storage synchronized with cloud state.");
-        } else {
-            console.log("ℹ️ No remote database document found. Using local baseline data.");
+            return true;
         }
+        return false;
     } catch (error) {
         console.error("❌ Error pulling from Firestore:", error);
+        return false;
     }
 }
