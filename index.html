@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Room Portal | Login</title>
+    <style>
+        :root {
+            --primary-color: #0056b3; --light-bg: #e6f2ff; --white-panel: #ffffff;
+            --main-bg: #f4f7f6; --text-dark: #333333; --text-light: #888888;
+            --border-color: #cccccc; --error-red: #dc3545;
+        }
+
+        body.theme-blue { --primary-color: #0056b3; --light-bg: #e6f2ff; }
+        body.theme-red { --primary-color: #d9534f; --light-bg: #fdf2f2; }
+        body.theme-green { --primary-color: #2b8a3e; --light-bg: #ebfbee; }
+        body.theme-yellow { --primary-color: #f59f00; --light-bg: #fff9db; }
+        body.theme-dark {
+            --primary-color: #3b5bdb; --light-bg: #2b2f3a; --white-panel: #1e222b;
+            --main-bg: #14171c; --text-dark: #f8f9fa; --text-light: #a6a7ab; --border-color: #373a40;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; transition: background-color 0.2s, border-color 0.2s, color 0.2s; }
+
+        body {
+            background: radial-gradient(circle at top right, var(--light-bg) 0%, var(--main-bg) 80%);
+            color: var(--text-dark); height: 100vh; width: 100vw;
+            display: flex; justify-content: center; align-items: center; padding: 20px;
+        }
+
+        .login-box {
+            background: var(--white-panel); padding: 40px; border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); width: 100%; max-width: 420px;
+            text-align: center; border: 1px solid var(--border-color);
+        }
+
+        .login-box h2 { color: var(--primary-color); font-size: 1.8rem; margin-bottom: 8px; font-weight: 700; }
+        .login-box p { color: var(--text-light); font-size: 0.9rem; margin-bottom: 30px; }
+
+        .form-group { margin-bottom: 22px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 14px; border: 1px solid var(--border-color);
+            border-radius: 8px; font-size: 1rem; outline: none; background-color: var(--white-panel); color: var(--text-dark);
+        }
+        .form-group input:focus, .form-group select:focus { border-color: var(--primary-color); }
+        .error-message { color: var(--error-red); font-size: 0.85rem; margin-top: 6px; display: none; font-weight: 500; }
+        
+        .btn-login {
+            width: 100%; padding: 14px; background-color: var(--primary-color); color: #ffffff;
+            border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 10px;
+        }
+
+        @media (max-width: 480px) {
+            .login-box { padding: 30px 20px; }
+            .login-box h2 { font-size: 1.5rem; }
+        }
+    </style>
+
+    <script type="module">
+        import { pullFromCloudToLocal } from './firebase-config.js';
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Background sync right when the page finishes rendering
+            await pullFromCloudToLocal();
+            if (typeof toggleIdField === "function") toggleIdField();
+        });
+    </script>
+</head>
+</head>
+<body>
+
+    <div class="login-box">
+        <h2>Welcome Back</h2>
+        <p>Please enter your access details below</p>
+        <form id="login-form" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="role">Account Type</label>
+                <select id="role" onchange="toggleIdField()">
+                    <option value="head">Head / Admin</option>
+                    <option value="teacher">Teacher</option>
+                    <option value="student">Student</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="id-field-container">
+                <label for="user-id">Assigned ID Key</label>
+                <input type="text" id="user-id" placeholder="e.g., admin, T-01 or S-01">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Access Security Key</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+                <div id="error-txt" class="error-message">✕ Access denied. Invalid credentials.</div>
+            </div>
+
+            <button type="submit" class="btn-login">Verify & Sign In</button>
+        </form>
+    </div>
+
+    <script>
+        window.onload = function() {
+            let savedTheme = localStorage.getItem('systemTheme') || 'blue';
+            document.body.className = 'theme-' + savedTheme;
+            toggleIdField();
+            
+            // Seed master admin entry if the system is blank
+            if (!localStorage.getItem('adminData')) {
+                let defaultAdmin = [{ id: "admin", name: "Head Admin", pass: "admin123" }];
+                localStorage.setItem('adminData', JSON.stringify(defaultAdmin));
+            }
+        }
+
+        function toggleIdField() {
+            const role = document.getElementById('role').value;
+            const idInput = document.getElementById('user-id');
+            const idLabel = idInput.previousElementSibling;
+
+            if (role === 'head') {
+                idLabel.innerText = "Admin ID Key";
+                idInput.placeholder = "e.g., admin or admin2";
+            } else if (role === 'teacher') {
+                idLabel.innerText = "Assigned ID Key";
+                idInput.placeholder = "e.g., T-101";
+            } else {
+                idLabel.innerText = "Assigned ID Key";
+                idInput.placeholder = "e.g., S-201";
+            }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const role = document.getElementById('role').value;
+            const password = document.getElementById('password').value;
+            const errorTxt = document.getElementById('error-txt');
+            const userId = document.getElementById('user-id').value.trim();
+
+            if (role === 'head') {
+                let adminList = JSON.parse(localStorage.getItem('adminData')) || [];
+                // Find matching admin by ID and Password
+                let validAdmin = adminList.find(a => a.id.toLowerCase() === userId.toLowerCase() && a.pass === password);
+
+                if (validAdmin) {
+                    errorTxt.style.display = 'none';
+                    sessionStorage.setItem('isAuthenticated', 'true');
+                    sessionStorage.setItem('userRole', 'head');
+                    sessionStorage.setItem('adminId', validAdmin.id);
+                    sessionStorage.setItem('adminName', validAdmin.name);
+                    window.location.replace("admin.html");
+                    return;
+                }
+            }
+
+            if (role === 'teacher') {
+                let staffList = JSON.parse(localStorage.getItem('staffData')) || [];
+                let validTeacher = staffList.find(t => t.id === userId && t.pass === password);
+
+                if (validTeacher) {
+                    errorTxt.style.display = 'none';
+                    sessionStorage.setItem('isAuthenticated', 'true');
+                    sessionStorage.setItem('userRole', 'teacher');
+                    sessionStorage.setItem('teacherName', validTeacher.name);
+                    sessionStorage.setItem('teacherSection', validTeacher.subject);
+                    window.location.replace("teacher.html");
+                    return;
+                }
+            }
+
+            if (role === 'student') {
+                let studentList = JSON.parse(localStorage.getItem('studentData')) || [];
+                let validStudent = studentList.find(s => s.id === userId && s.pass === password);
+
+                if (validStudent) {
+                    errorTxt.style.display = 'none';
+                    sessionStorage.setItem('isAuthenticated', 'true');
+                    sessionStorage.setItem('userRole', 'student');
+                    sessionStorage.setItem('studentId', validStudent.id);
+                    sessionStorage.setItem('studentName', validStudent.name);
+                    sessionStorage.setItem('studentBatch', validStudent.batch);
+                    window.location.replace("student.html");
+                    return;
+                }
+            }
+
+            errorTxt.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
