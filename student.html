@@ -14,7 +14,6 @@
     <script type="module">
         import { pullFromCloudToLocal } from './firebase-config.js';
         
-        // Background sync data right when student lands on portal workspace
         window.addEventListener('DOMContentLoaded', async () => {
             await pullFromCloudToLocal();
             if (typeof window.syncStudentUI === "function") {
@@ -241,11 +240,6 @@
     </div>
 
     <script>
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('sidebar-overlay').classList.toggle('active');
-        }
-
         let myId = '';
         let myName = '';
         let myBatch = '';
@@ -425,6 +419,11 @@
             sessionStorage.removeItem('isAuthenticated');
             sessionStorage.removeItem('userRole');
             window.location.replace("index.html"); 
+        }
+        
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('sidebar-overlay').classList.toggle('active');
         }
     </script>
 </body>
