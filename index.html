@@ -50,6 +50,7 @@
             width: 100%; padding: 14px; background-color: var(--primary-color); color: #ffffff;
             border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 10px;
         }
+        .btn-login:disabled { background-color: var(--text-light); cursor: not-allowed; }
 
         @media (max-width: 480px) {
             .login-box { padding: 30px 20px; }
@@ -59,13 +60,27 @@
 
     <script type="module">
         import { pullFromCloudToLocal } from './firebase-config.js';
+        window.isCloudSynced = false;
+
         window.addEventListener('DOMContentLoaded', async () => {
-            // Background sync right when the page finishes rendering
+            const loginBtn = document.querySelector('.btn-login');
+            if (loginBtn) {
+                loginBtn.innerText = "Synchronizing Cloud Database...";
+                loginBtn.disabled = true;
+            }
+
+            // Await complete cloud download before allowing login
             await pullFromCloudToLocal();
+            
+            window.isCloudSynced = true;
+            if (loginBtn) {
+                loginBtn.innerText = "Verify & Sign In";
+                loginBtn.disabled = false;
+            }
+
             if (typeof toggleIdField === "function") toggleIdField();
         });
     </script>
-</head>
 </head>
 <body>
 
@@ -93,7 +108,7 @@
                 <div id="error-txt" class="error-message">✕ Access denied. Invalid credentials.</div>
             </div>
 
-            <button type="submit" class="btn-login">Verify & Sign In</button>
+            <button type="submit" class="btn-login" disabled>Synchronizing Cloud Database...</button>
         </form>
     </div>
 
@@ -103,7 +118,6 @@
             document.body.className = 'theme-' + savedTheme;
             toggleIdField();
             
-            // Seed master admin entry if the system is blank
             if (!localStorage.getItem('adminData')) {
                 let defaultAdmin = [{ id: "admin", name: "Head Admin", pass: "admin123" }];
                 localStorage.setItem('adminData', JSON.stringify(defaultAdmin));
@@ -129,6 +143,12 @@
 
         function handleLogin(event) {
             event.preventDefault();
+
+            if (!window.isCloudSynced) {
+                alert("The system is still pulling down the configuration registry from the cloud. Please give it a brief moment.");
+                return;
+            }
+
             const role = document.getElementById('role').value;
             const password = document.getElementById('password').value;
             const errorTxt = document.getElementById('error-txt');
@@ -136,7 +156,6 @@
 
             if (role === 'head') {
                 let adminList = JSON.parse(localStorage.getItem('adminData')) || [];
-                // Find matching admin by ID and Password
                 let validAdmin = adminList.find(a => a.id.toLowerCase() === userId.toLowerCase() && a.pass === password);
 
                 if (validAdmin) {
