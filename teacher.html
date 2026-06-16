@@ -14,7 +14,6 @@
     <script type="module">
         import { pullFromCloudToLocal } from './firebase-config.js';
         
-        // Background sync data right when teacher lands on workspace
         window.addEventListener('DOMContentLoaded', async () => {
             await pullFromCloudToLocal();
             if (typeof window.syncTeacherUI === "function") {
