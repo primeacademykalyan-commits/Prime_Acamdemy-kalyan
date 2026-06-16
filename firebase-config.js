@@ -8,17 +8,15 @@ const firebaseConfig = {
     projectId: "prime-portal-27b1d",
     storageBucket: "prime-portal-27b1d.firebasestorage.app",
     messagingSenderId: "569175351808",
-    appId: "1:569175351808:web:1ff199dcdcdb693fac6ee5",
+    appId: "1:569175351808:web:1ff199dcdcdb693facee5",
     measurementId: "G-83XET5YB2J"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/**
- * Pushes all current localStorage datasets up to the Firestore Cloud
- */
 export async function uploadAllToCloud() {
+    // Send the raw text blocks directly without double wrapping them
     const masterPayload = {
         adminData: localStorage.getItem('adminData') || "[]",
         staffData: localStorage.getItem('staffData') || "[]",
@@ -40,9 +38,6 @@ export async function uploadAllToCloud() {
     }
 }
 
-/**
- * Pulls the latest cloud data down and overwrites browser localStorage
- */
 export async function pullFromCloudToLocal() {
     try {
         const docRef = doc(db, "portal_data", "classroom_master");
@@ -50,10 +45,11 @@ export async function pullFromCloudToLocal() {
         
         if (docSnap.exists()) {
             const data = docSnap.data();
+            // Unpack directly as raw text keys to match your dashboard structures perfectly
             Object.keys(data).forEach(key => {
                 localStorage.setItem(key, data[key]);
             });
-            console.log("🔄 Local storage synchronized with cloud state.");
+            console.log("🔄 Local storage synchronized cleanly.");
             return true;
         }
         return false;
