@@ -11,14 +11,11 @@
         }
     </script>
 
-    <!-- Firebase SDK Modules Integration -->
     <script type="module">
-        import { pullFromCloudToLocal, uploadAllToCloud } from './firebase-config.js';
+        import { pullFromCloudToLocal } from './firebase-config.js';
         
-        // Background sync data right when admin lands on workspace
         window.addEventListener('DOMContentLoaded', async () => {
             await pullFromCloudToLocal();
-            // Re-render components after local storage is fully synced from cloud
             if (typeof window.syncDashboardUI === "function") {
                 window.syncDashboardUI();
             }
@@ -342,7 +339,6 @@
         let currentTheme = 'blue';
         let activeStudentIndex = null;
 
-        // Central interface refresh point used by the cloud sync handler
         window.syncDashboardUI = function() {
             staffData = JSON.parse(localStorage.getItem('staffData')) || [];
             studentData = JSON.parse(localStorage.getItem('studentData')) || [];
@@ -370,7 +366,6 @@
             window.syncDashboardUI();
         };
 
-        // Utility to update local cache and push data synchronously to Firebase cloud storage
         function saveData(key, dataArray) { 
             localStorage.setItem(key, JSON.stringify(dataArray)); 
             updateDashboardSummary(); 
@@ -570,4 +565,4 @@
         }
     </script>
 </body>
-</html> 
+</html>
