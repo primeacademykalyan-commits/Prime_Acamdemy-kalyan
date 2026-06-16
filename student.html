@@ -122,7 +122,7 @@
             <li id="tab-dashboard" class="active" onclick="switchTab('dashboard')">🏠 Dashboard</li>
             <li id="tab-academics" onclick="switchTab('academics')">📚 Academics (HW/CW)</li>
             <li id="tab-reports" onclick="switchTab('reports')">📝 My Reports</li>
-            <li id="tab-attendance" onclick="switchTab('attendance')">📊 My Attendance</li>
+            <li id="tab-attendance" onclick="window.switchTab('attendance')">📊 My Attendance</li>
             <li id="tab-fees" onclick="switchTab('fees')">💳 Fee Ledger</li>
             <li id="tab-notice" onclick="switchTab('notice')">📢 Notice Board</li>
             <li id="tab-settings" onclick="switchTab('settings')">⚙️ Settings</li>
@@ -240,6 +240,11 @@
     </div>
 
     <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('sidebar-overlay').classList.toggle('active');
+        }
+
         let myId = '';
         let myName = '';
         let myBatch = '';
@@ -419,11 +424,6 @@
             sessionStorage.removeItem('isAuthenticated');
             sessionStorage.removeItem('userRole');
             window.location.replace("index.html"); 
-        }
-        
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('sidebar-overlay').classList.toggle('active');
         }
     </script>
 </body>
