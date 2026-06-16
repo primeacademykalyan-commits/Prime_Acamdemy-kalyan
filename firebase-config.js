@@ -8,7 +8,7 @@ const firebaseConfig = {
     projectId: "prime-portal-27b1d",
     storageBucket: "prime-portal-27b1d.firebasestorage.app",
     messagingSenderId: "569175351808",
-    appId: "1:569175351808:web:1ff199dcdcdb693facee5",
+    appId: "1:569175351808:web:1ff199dcdcdb693fac6ee5",
     measurementId: "G-83XET5YB2J"
 };
 
@@ -16,7 +16,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 export async function uploadAllToCloud() {
-    // Send the raw text blocks directly without double wrapping them
     const masterPayload = {
         adminData: localStorage.getItem('adminData') || "[]",
         staffData: localStorage.getItem('staffData') || "[]",
@@ -45,7 +44,6 @@ export async function pullFromCloudToLocal() {
         
         if (docSnap.exists()) {
             const data = docSnap.data();
-            // Unpack directly as raw text keys to match your dashboard structures perfectly
             Object.keys(data).forEach(key => {
                 localStorage.setItem(key, data[key]);
             });
