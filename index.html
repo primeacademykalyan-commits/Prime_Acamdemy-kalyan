@@ -109,7 +109,8 @@
             }
 
             if (role === 'head') {
-                let adminList = JSON.parse(localStorage.getItem('adminData')) || [];
+                let adminList = [];
+                try { adminList = JSON.parse(localStorage.getItem('adminData')) || []; } catch(e) { adminList = []; }
                 let validAdmin = adminList.find(a => a.id.toLowerCase() === userId.toLowerCase() && a.pass === password);
                 if (validAdmin) {
                     sessionStorage.setItem('isAuthenticated', 'true');
@@ -122,7 +123,8 @@
             }
 
             if (role === 'teacher') {
-                let staffList = JSON.parse(localStorage.getItem('staffData')) || [];
+                let staffList = [];
+                try { staffList = JSON.parse(localStorage.getItem('staffData')) || []; } catch(e) { staffList = []; }
                 let validTeacher = staffList.find(t => t.id === userId && t.pass === password);
                 if (validTeacher) {
                     sessionStorage.setItem('isAuthenticated', 'true');
@@ -135,7 +137,8 @@
             }
 
             if (role === 'student') {
-                let studentList = JSON.parse(localStorage.getItem('studentData')) || [];
+                let studentList = [];
+                try { studentList = JSON.parse(localStorage.getItem('studentData')) || []; } catch(e) { studentList = []; }
                 let validStudent = studentList.find(s => s.id === userId && s.pass === password);
                 if (validStudent) {
                     sessionStorage.setItem('isAuthenticated', 'true');
