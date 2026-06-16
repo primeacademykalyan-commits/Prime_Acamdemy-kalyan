@@ -50,7 +50,7 @@
             width: 100%; padding: 14px; background-color: var(--primary-color); color: #ffffff;
             border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 10px;
         }
-        .btn-login:disabled { background-color: var(--text-light); cursor: not-allowed; }
+        .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
 
         @media (max-width: 480px) {
             .login-box { padding: 30px 20px; }
@@ -60,24 +60,11 @@
 
     <script type="module">
         import { pullFromCloudToLocal } from './firebase-config.js';
-        window.isCloudSynced = false;
-
+        window.pullFromCloudToLocal = pullFromCloudToLocal;
         window.addEventListener('DOMContentLoaded', async () => {
-            const loginBtn = document.querySelector('.btn-login');
-            if (loginBtn) {
-                loginBtn.innerText = "Synchronizing Cloud Database...";
-                loginBtn.disabled = true;
-            }
-
-            // Await complete cloud download before allowing login
             await pullFromCloudToLocal();
-            
-            window.isCloudSynced = true;
-            if (loginBtn) {
-                loginBtn.innerText = "Verify & Sign In";
-                loginBtn.disabled = false;
-            }
-
+            let savedTheme = localStorage.getItem('systemTheme') || 'blue';
+            document.body.className = 'theme-' + savedTheme;
             if (typeof toggleIdField === "function") toggleIdField();
         });
     </script>
@@ -108,16 +95,13 @@
                 <div id="error-txt" class="error-message">✕ Access denied. Invalid credentials.</div>
             </div>
 
-            <button type="submit" class="btn-login" disabled>Synchronizing Cloud Database...</button>
+            <button type="submit" class="btn-login">Verify & Sign In</button>
         </form>
     </div>
 
     <script>
         window.onload = function() {
-            let savedTheme = localStorage.getItem('systemTheme') || 'blue';
-            document.body.className = 'theme-' + savedTheme;
             toggleIdField();
-            
             if (!localStorage.getItem('adminData')) {
                 let defaultAdmin = [{ id: "admin", name: "Head Admin", pass: "admin123" }];
                 localStorage.setItem('adminData', JSON.stringify(defaultAdmin));
@@ -141,17 +125,21 @@
             }
         }
 
-        function handleLogin(event) {
+        async function handleLogin(event) {
             event.preventDefault();
+            const btn = document.querySelector('.btn-login');
+            const errorTxt = document.getElementById('error-txt');
+            
+            errorTxt.style.display = 'none';
+            btn.disabled = true;
+            btn.innerText = "Syncing with Cloud Database...";
 
-            if (!window.isCloudSynced) {
-                alert("The system is still pulling down the configuration registry from the cloud. Please give it a brief moment.");
-                return;
+            if (typeof window.pullFromCloudToLocal === "function") {
+                await window.pullFromCloudToLocal();
             }
 
             const role = document.getElementById('role').value;
             const password = document.getElementById('password').value;
-            const errorTxt = document.getElementById('error-txt');
             const userId = document.getElementById('user-id').value.trim();
 
             if (role === 'head') {
@@ -159,7 +147,6 @@
                 let validAdmin = adminList.find(a => a.id.toLowerCase() === userId.toLowerCase() && a.pass === password);
 
                 if (validAdmin) {
-                    errorTxt.style.display = 'none';
                     sessionStorage.setItem('isAuthenticated', 'true');
                     sessionStorage.setItem('userRole', 'head');
                     sessionStorage.setItem('adminId', validAdmin.id);
@@ -174,7 +161,6 @@
                 let validTeacher = staffList.find(t => t.id === userId && t.pass === password);
 
                 if (validTeacher) {
-                    errorTxt.style.display = 'none';
                     sessionStorage.setItem('isAuthenticated', 'true');
                     sessionStorage.setItem('userRole', 'teacher');
                     sessionStorage.setItem('teacherName', validTeacher.name);
@@ -189,7 +175,6 @@
                 let validStudent = studentList.find(s => s.id === userId && s.pass === password);
 
                 if (validStudent) {
-                    errorTxt.style.display = 'none';
                     sessionStorage.setItem('isAuthenticated', 'true');
                     sessionStorage.setItem('userRole', 'student');
                     sessionStorage.setItem('studentId', validStudent.id);
@@ -201,6 +186,8 @@
             }
 
             errorTxt.style.display = 'block';
+            btn.disabled = false;
+            btn.innerText = "Verify & Sign In";
         }
     </script>
 </body>
