@@ -4,16 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Portal</title>
-    
     <script>
         if (sessionStorage.getItem('isAuthenticated') !== 'true' || sessionStorage.getItem('userRole') !== 'student') {
             window.location.replace("index.html");
         }
     </script>
-
     <script type="module">
         import { pullFromCloudToLocal } from './firebase-config.js';
-        
         window.addEventListener('DOMContentLoaded', async () => {
             await pullFromCloudToLocal();
             if (typeof window.syncStudentUI === "function") {
@@ -21,14 +18,12 @@
             }
         });
     </script>
-
     <style>
         :root {
             --primary-color: #0056b3; --light-bg: #e6f2ff; --white-panel: #ffffff;
             --main-bg: #f4f7f6; --text-dark: #333333; --text-light: #888888;
             --border-color: #cccccc; --error-red: #dc3545; --success-green: #28a745;
         }
-
         body.theme-blue { --primary-color: #0056b3; --light-bg: #e6f2ff; }
         body.theme-red { --primary-color: #d9534f; --light-bg: #fdf2f2; }
         body.theme-green { --primary-color: #2b8a3e; --light-bg: #ebfbee; }
@@ -37,95 +32,63 @@
             --primary-color: #3b5bdb; --light-bg: #2b2f3a; --white-panel: #1e222b;
             --main-bg: #14171c; --text-dark: #f8f9fa; --text-light: #a6a7ab; --border-color: #373a40;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; transition: background-color 0.2s, border-color 0.2s, color 0.2s; }
         body { background-color: var(--main-bg); color: var(--text-dark); height: 100vh; width: 100vw; display: flex; overflow: hidden; }
-
         .mobile-header { display: none; justify-content: space-between; align-items: center; background-color: var(--primary-color); color: white; padding: 15px 20px; width: 100%; z-index: 999; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .hamburger-btn { background: none; border: none; color: white; font-size: 1.8rem; cursor: pointer; }
-
         .sidebar { width: 260px; background-color: var(--primary-color); color: #ffffff; display: flex; flex-direction: column; box-shadow: 4px 0 10px rgba(0,0,0,0.05); z-index: 1000; }
         .sidebar-header { padding: 24px 24px 10px 24px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-        .profile-container { margin-bottom: 12px; }
         .profile-pic { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255,255,255,0.3); margin: 0 auto; display: block; background: white; }
         .sidebar-title { font-size: 1.2rem; font-weight: 700; }
-        
         .nav-links { list-style: none; padding: 10px 0; overflow-y: auto; flex: 1; }
         .nav-links li { padding: 16px 28px; cursor: pointer; font-weight: 500; font-size: 0.95rem; border-left: 4px solid transparent; }
         .nav-links li:hover, .nav-links li.active { background-color: rgba(255, 255, 255, 0.1); border-left-color: #ffffff; }
         .logout-btn { padding: 22px; text-align: center; background-color: rgba(0,0,0,0.15); cursor: pointer; font-weight: 600; }
         .logout-btn:hover { background-color: var(--error-red); color: white; }
         .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 998; }
-
         .main-wrapper { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .main-content { flex: 1; padding: 35px; overflow-y: auto; position: relative; }
         .view-panel { display: none; }
         .view-panel.active { display: block; }
-
         .welcome-banner { margin-bottom: 25px; background: var(--white-panel); padding: 20px; border-radius: 10px; border-left: 5px solid var(--primary-color); box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
         .welcome-banner h1 { color: var(--primary-color); font-size: 1.6rem; margin-bottom: 5px; }
         .welcome-banner p { color: var(--text-light); font-size: 0.95rem; font-weight: 500; }
-
         .card { background-color: var(--white-panel); padding: 24px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border-top: 4px solid var(--primary-color); margin-bottom: 25px; }
         .card h3 { margin-bottom: 15px; color: var(--primary-color); font-weight: 700; font-size: 1.15rem; }
-
         .history-item { border-left: 4px solid var(--primary-color); padding: 15px; background: var(--main-bg); border-radius: 0 8px 8px 0; margin-bottom: 12px; font-size: 0.95rem; }
         .history-item h5 { color: var(--primary-color); margin-bottom: 4px; font-size: 1rem;}
-        
-        .notice-card { border-left: 5px solid var(--primary-color); background: var(--main-bg); padding: 18px; margin-bottom: 15px; border-radius: 0 10px 10px 0; }
-
         .fee-summary { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 25px; background: var(--main-bg); padding: 20px; border-radius: 8px; gap: 10px; text-align: center;}
         .fee-item { flex: 1; }
         .fee-item h4 { font-size: 0.85rem; color: var(--text-light); text-transform: uppercase; margin-bottom: 8px; }
         .fee-item .amt { font-size: 1.8rem; font-weight: bold; color: var(--primary-color); }
         .fee-item .amt.rem { color: var(--error-red); }
         .fee-item .amt.paid { color: var(--success-green); }
-
         table { width: 100%; border-collapse: collapse; }
         th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; }
-        th { color: var(--text-light); font-weight: 600; }
-        
         .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
-
         .btn-action { background-color: var(--primary-color); color: white; border: none; padding: 14px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1rem; margin-top: 5px; }
-        .theme-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-top: 15px; }
-        .theme-btn { padding: 16px; border: 2px solid var(--border-color); border-radius: 8px; background: var(--white-panel); color: var(--text-dark); cursor: pointer; font-weight: bold; text-align: center; }
-
-        @media (max-width: 768px) {
-            body { flex-direction: column; }
-            .mobile-header { display: flex; }
-            .sidebar { position: fixed; left: -260px; top: 0; height: 100vh; transition: left 0.3s ease-in-out; }
-            .sidebar.active { left: 0; }
-            .sidebar-overlay.active { display: block; }
-            .main-content { padding: 15px; }
-            .fee-summary { flex-direction: column; }
-        }
+        @media (max-width: 768px) { body { flex-direction: column; } .mobile-header { display: flex; } .sidebar { position: fixed; left: -260px; top: 0; height: 100vh; transition: left 0.3s ease-in-out; } .sidebar.active { left: 0; } .sidebar-overlay.active { display: block; } .main-content { padding: 15px; } .fee-summary { flex-direction: column; } }
     </style>
 </head>
 <body>
-
     <div class="mobile-header">
         <h2 style="font-size: 1.2rem;">Student Portal</h2>
         <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
     </div>
-
     <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="profile-container">
-                <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" id="sidebar-profile-pic" class="profile-pic" alt="Student Profile">
-            </div>
+            <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" id="sidebar-profile-pic" class="profile-pic" alt="Student Profile">
             <div class="sidebar-title">Student Portal</div>
         </div>
         <ul class="nav-links">
             <li id="tab-dashboard" class="active" onclick="switchTab('dashboard')">🏠 Dashboard</li>
             <li id="tab-academics" onclick="switchTab('academics')">📚 Academics (HW/CW)</li>
             <li id="tab-reports" onclick="switchTab('reports')">📝 My Reports</li>
-            <li id="tab-attendance" onclick="window.switchTab('attendance')">📊 My Attendance</li>
+            <li id="tab-attendance" onclick="switchTab('attendance')">📊 My Attendance</li>
             <li id="tab-fees" onclick="switchTab('fees')">💳 Fee Ledger</li>
             <li id="tab-notice" onclick="switchTab('notice')">📢 Notice Board</li>
-            <li id="tab-settings" onclick="switchTab('settings')">⚙️ Settings</li>
         </ul>
         <div class="logout-btn" onclick="logout()">Secure Logout</div>
     </div>
@@ -140,7 +103,7 @@
             <div id="view-dashboard" class="view-panel active">
                 <div class="card">
                     <h3>Today's Overview</h3>
-                    <p style="color:var(--text-light); font-size: 0.95rem; margin-bottom: 15px;">Welcome to your personal study room portal. Check your sidebar for new assignments, notices, and progress reports.</p>
+                    <p style="color:var(--text-light);">Welcome to your portal page dashboard workspace logs.</p>
                     <div style="display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap;">
                         <button class="btn-action" style="flex: 1;" onclick="switchTab('academics')">Check Homework</button>
                         <button class="btn-action" style="flex: 1; background: var(--main-bg); color: var(--text-dark); border: 1px solid var(--border-color);" onclick="switchTab('notice')">Read Notices</button>
@@ -149,40 +112,21 @@
             </div>
 
             <div id="view-academics" class="view-panel">
-                <div class="card">
-                    <h3>Assigned Homework</h3>
-                    <p style="color:var(--text-light); font-size:0.85rem; margin-bottom:15px;">Homework specifically assigned to your batch.</p>
-                    <div id="student-hw-container"></div>
-                </div>
-                <div class="card">
-                    <h3>Recent Classwork</h3>
-                    <p style="color:var(--text-light); font-size:0.85rem; margin-bottom:15px;">Topics covered recently in your batch sessions.</p>
-                    <div id="student-cw-container"></div>
-                </div>
+                <div class="card"><h3>Assigned Homework</h3><div id="student-hw-container"></div></div>
+                <div class="card"><h3>Recent Classwork</h3><div id="student-cw-container"></div></div>
             </div>
 
             <div id="view-reports" class="view-panel">
-                <div class="card">
-                    <h3>My Progress Reports</h3>
-                    <p style="color:var(--text-light); font-size:0.85rem; margin-bottom:15px;">Evaluations and grades logged by your instructors.</p>
-                    <div id="student-reports-container"></div>
-                </div>
+                <div class="card"><h3>My Progress Reports</h3><div id="student-reports-container"></div></div>
             </div>
 
             <div id="view-attendance" class="view-panel">
                 <div class="card">
                     <h3>My Attendance History</h3>
-                    <p style="color:var(--text-light); font-size:0.85rem; margin-bottom:15px;">Your daily presence logs recorded by center instructors.</p>
                     <div style="overflow-x: auto;">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="student-attendance-history">
-                            </tbody>
+                            <thead><tr><th>Date</th><th>Status</th></tr></thead>
+                            <tbody id="student-attendance-history"></tbody>
                         </table>
                     </div>
                 </div>
@@ -196,8 +140,7 @@
                         <div class="fee-item"><h4>Amount Paid</h4><div class="amt paid" id="display-paid">₹0</div></div>
                         <div class="fee-item"><h4>Balance Due</h4><div class="amt rem" id="display-rem">₹0</div></div>
                     </div>
-                    
-                    <h3 style="margin-top: 30px; margin-bottom: 15px; font-size: 1rem;">Payment Receipt History</h3>
+                    <h3 style="margin-top: 30px; margin-bottom: 15px; font-size: 1rem;">Payment History</h3>
                     <div style="overflow-x: auto;">
                         <table>
                             <thead><tr><th>Date & Time</th><th>Amount Paid</th><th>Status</th></tr></thead>
@@ -208,223 +151,84 @@
             </div>
 
             <div id="view-notice" class="view-panel">
-                <div class="card">
-                    <h3>Active Center Bulletins</h3>
-                    <div id="student-notice-container"></div>
-                </div>
+                <div class="card"><h3>Active Center Bulletins</h3><div id="student-notice-container"></div></div>
             </div>
-
-            <div id="view-settings" class="view-panel">
-                <div class="card">
-                    <h3>Update Profile Picture</h3>
-                    <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px;">
-                        <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" id="settings-profile-pic" class="profile-pic" style="border-color: var(--primary-color);">
-                        <input type="file" id="profile-upload" accept="image/*" style="padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; flex: 1; background: var(--main-bg); color: var(--text-dark);">
-                    </div>
-                    <button class="btn-action" onclick="saveProfilePic()">💾 Save Profile Photo</button>
-                </div>
-
-                <div class="card">
-                    <h3>Interface Preferences</h3>
-                    <div class="theme-grid">
-                        <button class="theme-btn" onclick="setTheme('blue')" style="border-top: 4px solid #0056b3;">Blue</button>
-                        <button class="theme-btn" onclick="setTheme('red')" style="border-top: 4px solid #d9534f;">Red</button>
-                        <button class="theme-btn" onclick="setTheme('green')" style="border-top: 4px solid #2b8a3e;">Green</button>
-                        <button class="theme-btn" onclick="setTheme('yellow')" style="border-top: 4px solid #f59f00;">Yellow</button>
-                        <button class="theme-btn" onclick="setTheme('dark')" style="background: #2b2f3a; color: #fff; border-top: 4px solid #3b5bdb;">Dark 🌙</button>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
 
     <script>
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('sidebar-overlay').classList.toggle('active');
-        }
-
-        let myId = '';
-        let myName = '';
-        let myBatch = '';
-
-        let studentData = [];
-        let hwRecords = [];
-        let cwRecords = [];
-        let reportRecords = [];
-        let noticeData = [];
-        let attendanceRecords = [];
-        let currentTheme = 'blue';
+        let myId = ''; let myName = ''; let myBatch = '';
+        let studentData = []; let hwRecords = []; let cwRecords = []; let reportRecords = []; let noticeData = []; let attendanceRecords = [];
 
         window.syncStudentUI = function() {
-            myId = sessionStorage.getItem('studentId');
-            myName = sessionStorage.getItem('studentName');
-            myBatch = sessionStorage.getItem('studentBatch');
+            myId = sessionStorage.getItem('studentId'); myName = sessionStorage.getItem('studentName'); myBatch = sessionStorage.getItem('studentBatch');
 
-            studentData = JSON.parse(localStorage.getItem('studentData')) || [];
-            hwRecords = JSON.parse(localStorage.getItem('hwRecords')) || [];
-            cwRecords = JSON.parse(localStorage.getItem('cwRecords')) || [];
-            reportRecords = JSON.parse(localStorage.getItem('reportRecords')) || [];
-            noticeData = JSON.parse(localStorage.getItem('noticeData')) || [];
-            attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
-            currentTheme = localStorage.getItem('systemTheme') || 'blue';
+            try { studentData = JSON.parse(localStorage.getItem('studentData')) || []; } catch(e) { studentData = []; }
+            try { hwRecords = JSON.parse(localStorage.getItem('hwRecords')) || []; } catch(e) { hwRecords = []; }
+            try { cwRecords = JSON.parse(localStorage.getItem('cwRecords')) || []; } catch(e) { cwRecords = []; }
+            try { reportRecords = JSON.parse(localStorage.getItem('reportRecords')) || []; } catch(e) { reportRecords = []; }
+            try { noticeData = JSON.parse(localStorage.getItem('noticeData')) || []; } catch(e) { noticeData = []; }
+            try { attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords')) || []; } catch(e) { attendanceRecords = []; }
 
-            setTheme(currentTheme);
-            loadProfilePic();
-            
-            document.getElementById('student-greet').innerText = `Welcome back, ${myName}`;
-            document.getElementById('student-sub').innerText = `Batch Assignment: ${myBatch} | ID: ${myId}`;
+            let savedTheme = localStorage.getItem('systemTheme') || 'blue';
+            document.body.className = 'theme-' + savedTheme;
+            document.getElementById('student-greet').innerText = `Welcome back, ${myName || 'Student'}`;
+            document.getElementById('student-sub').innerText = `Batch: ${myBatch || 'General'} | ID: ${myId}`;
 
-            renderAcademics();
-            renderReports();
-            renderFees();
-            renderNotices();
-            renderStudentAttendance();
+            renderAcademics(); renderReports(); renderFees(); renderNotices(); renderStudentAttendance();
         };
 
-        window.onload = function() {
-            window.syncStudentUI();
-        };
-
-        function triggerCloudSync() {
-            import('./firebase-config.js').then(m => m.uploadAllToCloud());
-        }
-
-        function loadProfilePic() {
-            const role = 'student';
-            const picKey = `profilePic_${role}_${myId}`;
-            const savedPic = localStorage.getItem(picKey);
-            const defaultPic = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
-            document.getElementById('sidebar-profile-pic').src = savedPic || defaultPic;
-            document.getElementById('settings-profile-pic').src = savedPic || defaultPic;
-        }
-
-        function saveProfilePic() {
-            const fileInput = document.getElementById('profile-upload');
-            if (fileInput.files.length === 0) return alert("Please select an image file first.");
-            const file = fileInput.files[0];
-            if (file.size > 2000000) return alert("Image is too large! Please select an image under 2MB."); 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                localStorage.setItem(`profilePic_student_${myId}`, e.target.result);
-                triggerCloudSync();
-                loadProfilePic(); alert("Profile picture updated successfully!");
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function setTheme(themeName) { document.body.className = ''; document.body.classList.add(`theme-${themeName}`); localStorage.setItem('systemTheme', themeName); }
-
-        function switchTab(tabID) {
-            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-links li').forEach(b => b.classList.remove('active'));
-            document.getElementById(`view-${tabID}`).classList.add('active');
-            document.getElementById(`tab-${tabID}`).classList.add('active');
-            if(window.innerWidth <= 768) toggleSidebar();
-        }
+        window.onload = function() { window.syncStudentUI(); };
 
         function renderAcademics() {
-            const myHw = hwRecords.filter(r => r.batch === myBatch);
-            const hwContainer = document.getElementById('student-hw-container');
-            hwContainer.innerHTML = '';
-            if(myHw.length === 0) hwContainer.innerHTML = `<p style="color:gray; font-size:0.9rem;">No homework listed for your batch.</p>`;
-            else {
-                myHw.forEach(r => { hwContainer.innerHTML += `<div class="history-item"><h5>Issued on: <span style="color:var(--text-light);font-size:0.8rem;font-weight:normal;">${r.date}</span></h5><p style="margin-top:5px;">${r.task}</p></div>`; });
-            }
+            const myHw = hwRecords.filter(r => r.batch === myBatch); const hwContainer = document.getElementById('student-hw-container'); hwContainer.innerHTML = '';
+            if(myHw.length === 0) hwContainer.innerHTML = `<p style="color:gray;">No logs compiled.</p>`;
+            else myHw.forEach(r => { hwContainer.innerHTML += `<div class="history-item"><h5>Issued: ${r.date}</h5><p>${r.task}</p></div>`; });
 
-            const myCw = cwRecords.filter(r => r.batch === myBatch);
-            const cwContainer = document.getElementById('student-cw-container');
-            cwContainer.innerHTML = '';
-            if(myCw.length === 0) cwContainer.innerHTML = `<p style="color:gray; font-size:0.9rem;">No classwork logged for your batch.</p>`;
-            else {
-                myCw.forEach(r => { cwContainer.innerHTML += `<div class="history-item"><h5>Logged on: <span style="color:var(--text-light);font-size:0.8rem;font-weight:normal;">${r.date}</span></h5><p style="margin-top:5px;">${r.task}</p></div>`; });
-            }
+            const myCw = cwRecords.filter(r => r.batch === myBatch); const cwContainer = document.getElementById('student-cw-container'); cwContainer.innerHTML = '';
+            if(myCw.length === 0) cwContainer.innerHTML = `<p style="color:gray;">No logs compiled.</p>`;
+            else myCw.forEach(r => { cwContainer.innerHTML += `<div class="history-item"><h5>Covered: ${r.date}</h5><p>${r.task}</p></div>`; });
         }
 
         function renderReports() {
-            const myReports = reportRecords.filter(r => r.studentId === myId);
-            const container = document.getElementById('student-reports-container');
-            container.innerHTML = '';
-            if(myReports.length === 0) container.innerHTML = `<p style="color:gray; font-size:0.9rem;">No reports published for you yet.</p>`;
-            else {
-                myReports.forEach(r => { 
-                    container.innerHTML += `
-                        <div class="history-item" style="border-left-color: var(--success-green);">
-                            <h5 style="color:var(--success-green);">Score / Grade: ${r.score} <span style="color:var(--text-light);font-size:0.8rem;float:right;font-weight:normal;">${r.date}</span></h5>
-                            <p style="margin-top:8px;"><strong>Feedback:</strong> ${r.notes}</p>
-                        </div>`; 
-                });
-            }
+            const myReports = reportRecords.filter(r => r.studentId === myId); const container = document.getElementById('student-reports-container'); container.innerHTML = '';
+            if(myReports.length === 0) container.innerHTML = `<p style="color:gray;">No evaluation reports listed.</p>`;
+            else myReports.forEach(r => { container.innerHTML += `<div class="history-item"><h5>Score: ${r.score} <span>(${r.date})</span></h5><p>${r.notes}</p></div>`; });
         }
 
         function renderStudentAttendance() {
-            const myAttendance = attendanceRecords.filter(r => r.studentId === myId);
-            const historyBody = document.getElementById('student-attendance-history');
-            historyBody.innerHTML = '';
-
-            if(myAttendance.length === 0) {
-                historyBody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:gray; padding: 20px;">No attendance records found yet.</td></tr>`;
-                return;
-            }
-
+            const myAttendance = attendanceRecords.filter(r => r.studentId === myId); const historyBody = document.getElementById('student-attendance-history'); historyBody.innerHTML = '';
+            if(myAttendance.length === 0) { historyBody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:gray;">No attendance parameters logged.</td></tr>`; return; }
             myAttendance.slice().reverse().forEach(r => {
                 let badgeColor = r.status === 'Present' ? 'var(--success-green)' : 'var(--error-red)';
-                let bgStyle = r.status === 'Present' ? 'rgba(40, 167, 69, 0.1)' : 'rgba(220, 53, 69, 0.1)';
-                
-                historyBody.innerHTML += `
-                    <tr>
-                        <td>${r.date}</td>
-                        <td>
-                            <span class="status-badge" style="background: ${bgStyle}; color: ${badgeColor};">
-                                ${r.status}
-                            </span>
-                        </td>
-                    </tr>
-                `;
+                historyBody.innerHTML += `<tr><td>${r.date}</td><td><span class="status-badge" style="color:${badgeColor};">${r.status}</span></td></tr>`;
             });
         }
 
         function renderFees() {
-            const myProfile = studentData.find(s => s.id === myId);
-            if(!myProfile) return;
+            const profile = studentData.find(s => s.id === myId); if(!profile) return;
+            const total = profile.totalFee || 0; const payments = profile.payments || [];
+            const paid = payments.reduce((sum, r) => sum + parseInt(r.amount), 0);
+            document.getElementById('display-total').innerText = `₹${total}`; document.getElementById('display-paid').innerText = `₹${paid}`; document.getElementById('display-rem').innerText = `₹${total - paid}`;
 
-            const total = myProfile.totalFee || 0;
-            const payments = myProfile.payments || [];
-            const paid = payments.reduce((sum, record) => sum + parseInt(record.amount), 0);
-            const rem = total - paid;
-
-            document.getElementById('display-total').innerText = `₹${total}`;
-            document.getElementById('display-paid').innerText = `₹${paid}`;
-            document.getElementById('display-rem').innerText = `₹${rem}`;
-
-            const historyBody = document.getElementById('student-payment-history');
-            historyBody.innerHTML = '';
-            if(payments.length === 0) { 
-                historyBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:gray; padding: 20px;">No payment records found.</td></tr>`; 
-            } else { 
-                payments.forEach((p) => { 
-                    historyBody.innerHTML += `
-                        <tr>
-                            <td>${p.date} <span style="font-size:0.8rem;color:gray;">(${p.time})</span></td>
-                            <td style="font-weight:bold; color:var(--success-green);">+ ₹${p.amount}</td>
-                            <td><span class="status-badge" style="background:rgba(40,167,69,0.1); color:var(--success-green);">Verified</span></td>
-                        </tr>`; 
-                }); 
-            }
+            const historyBody = document.getElementById('student-payment-history'); historyBody.innerHTML = '';
+            if(payments.length === 0) { historyBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:gray;">No records.</td></tr>`; } 
+            else { payments.forEach(p => { historyBody.innerHTML += `<tr><td>${p.date}</td><td style="color:var(--success-green);">₹${p.amount}</td><td><span class="status-badge status-clear">Verified</span></td></tr>`; }); }
         }
 
         function renderNotices() {
             const container = document.getElementById('student-notice-container'); container.innerHTML = '';
-            if(noticeData.length === 0) { container.innerHTML = `<p style="color:gray;text-align:center;padding:15px;">No active notices.</p>`; return; }
-            noticeData.forEach(n => { container.innerHTML += `<div class="notice-card"><h4 style="color:var(--primary-color);">${n.text}</h4></div>`; });
+            if(noticeData.length === 0) { container.innerHTML = `<p style="color:gray;text-align:center;">No announcements.</p>`; return; }
+            noticeData.forEach(n => { container.innerHTML += `<div class="notice-card"><h4>${n.text}</h4></div>`; });
         }
 
-        function logout() { 
-            sessionStorage.removeItem('isAuthenticated');
-            sessionStorage.removeItem('userRole');
-            window.location.replace("index.html"); 
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('sidebar-overlay').classList.toggle('active'); }
+        function switchTab(tabID) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active')); document.querySelectorAll('.nav-links li').forEach(b => b.classList.remove('active'));
+            document.getElementById(`view-${tabID}`).classList.add('active'); document.getElementById(`tab-${tabID}`).classList.add('active');
+            if(window.innerWidth <= 768) toggleSidebar();
         }
+        function logout() { sessionStorage.clear(); window.location.replace("index.html"); }
     </script>
 </body>
 </html>
